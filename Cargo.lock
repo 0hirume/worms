@@ -619,9 +619,9 @@ dependencies = [
 
 [[package]]
 name = "larvae"
-version = "0.7.4"
+version = "0.7.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "97ae716e73905ee4ea76583633d9464b98ebcbbe5b7ce5926337d544c54589d6"
+checksum = "8be402e68ace36bb7a249f8bfc8c2bf544a8ab3b37e89cdf9f496d595fdf0458"
 dependencies = [
  "anyhow",
  "clap",
@@ -652,9 +652,9 @@ dependencies = [
 
 [[package]]
 name = "larvae-worm"
-version = "0.7.4"
+version = "0.7.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "821c59b6dc4e93122127a6457c01978cd2f751be9bf3adf4497ccead15ef0d2f"
+checksum = "1ba7f92c9935defbd2884f8345d5a64e60d4ebc8e0579635b1d3986a5e48d4fc"
 dependencies = [
  "serde",
  "serde_json",
