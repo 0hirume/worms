@@ -1,4 +1,4 @@
-use larvae::syntax::ast::{CallArgs, Expr, Stmt};
+use larvae::syntax::ast::{CallArgs, Expr, IndexKey, Stmt, TableField};
 use larvae::syntax::lexer::Tok;
 
 use crate::syntax::span_text;
@@ -29,6 +29,12 @@ pub fn gap_between(
     is_top: bool,
 ) -> Option<Gap> {
     if matches!(next, Stmt::Return(_)) || is_block_statement(previous) || is_block_statement(next) {
+        return Some(Gap::Blank);
+    }
+
+    if has_expanded_expression(previous, source, tokens)
+        || has_expanded_expression(next, source, tokens)
+    {
         return Some(Gap::Blank);
     }
 
@@ -247,6 +253,82 @@ fn root_name<'a>(expression: &Expr, source: &'a str, tokens: &[Tok]) -> Option<&
 fn is_multiline_declaration(statement: &Stmt, source: &str, tokens: &[Tok]) -> bool {
     matches!(statement, Stmt::Local(_) | Stmt::TypeAlias(_))
         && span_text(statement.span(), source, tokens).contains('\n')
+}
+
+fn has_expanded_expression(statement: &Stmt, source: &str, tokens: &[Tok]) -> bool {
+    let expressions: &[Expr] = match statement {
+        Stmt::Assign(assignment) => &assignment.values,
+        Stmt::Return(statement) => &statement.values,
+        Stmt::Call(expression, _) => std::slice::from_ref(expression),
+        _ => return false,
+    };
+
+    expressions
+        .iter()
+        .any(|expression| is_expanded_expression(expression, source, tokens))
+}
+
+fn is_expanded_expression(expression: &Expr, source: &str, tokens: &[Tok]) -> bool {
+    if matches!(
+        expression,
+        Expr::Call { .. } | Expr::Function { .. } | Expr::IfElse { .. } | Expr::Table { .. }
+    ) && span_text(expression.span(), source, tokens).contains('\n')
+    {
+        return true;
+    }
+
+    match expression {
+        Expr::Table { fields, .. } => fields.iter().any(|field| match field {
+            TableField::Positional(value) | TableField::Named { value, .. } => {
+                is_expanded_expression(value, source, tokens)
+            }
+            TableField::Computed { key, value } => {
+                is_expanded_expression(key, source, tokens)
+                    || is_expanded_expression(value, source, tokens)
+            }
+        }),
+        Expr::Binary { lhs, rhs, .. } => {
+            is_expanded_expression(lhs, source, tokens)
+                || is_expanded_expression(rhs, source, tokens)
+        }
+        Expr::Unary { operand, .. } => is_expanded_expression(operand, source, tokens),
+        Expr::Paren { inner, .. } | Expr::TypeAssert { expr: inner, .. } => {
+            is_expanded_expression(inner, source, tokens)
+        }
+        Expr::Index { object, key, .. } => {
+            is_expanded_expression(object, source, tokens)
+                || matches!(key, IndexKey::Computed(key) if is_expanded_expression(key, source, tokens))
+        }
+        Expr::Call { func, args, .. } => {
+            is_expanded_expression(func, source, tokens)
+                || match args {
+                    CallArgs::Paren(arguments) => arguments
+                        .iter()
+                        .any(|argument| is_expanded_expression(argument, source, tokens)),
+                    CallArgs::Table(table) => is_expanded_expression(table, source, tokens),
+                    CallArgs::Str(_) => false,
+                }
+        }
+        Expr::IfElse {
+            branches,
+            else_value,
+            ..
+        } => {
+            branches.iter().any(|(condition, value)| {
+                is_expanded_expression(condition, source, tokens)
+                    || is_expanded_expression(value, source, tokens)
+            }) || is_expanded_expression(else_value, source, tokens)
+        }
+        Expr::Nil(_)
+        | Expr::True(_)
+        | Expr::False(_)
+        | Expr::Vararg(_)
+        | Expr::Number(_)
+        | Expr::String(_)
+        | Expr::InterpString(_)
+        | Expr::Function { .. }
+        | Expr::Name(_) => false,
+    }
 }
 
 fn is_reimported_type(span: larvae::syntax::ast::TokSpan, source: &str, tokens: &[Tok]) -> bool {
