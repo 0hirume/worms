@@ -1,0 +1,21 @@
+const FIRST = 1
+
+const OPTIONS = configure({
+	enabled = true,
+})
+
+const LAST = 2
+
+local function build()
+	const primary = create()
+	primary.name = "primary"
+	primary["enabled"] = true
+
+	const secondary = create()
+	secondary.name = "secondary"
+	secondary.parent = primary
+
+	return secondary
+end
+
+return build

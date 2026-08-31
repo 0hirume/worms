@@ -35,6 +35,11 @@ fn multiline_and_simple_types() {
 }
 
 #[test]
+fn declarations_and_related_mutations() {
+    check_fixture("declarations", &FmtConfig::default());
+}
+
+#[test]
 fn guards_and_noninitial_returns() {
     check_fixture("guards", &FmtConfig::default());
 }

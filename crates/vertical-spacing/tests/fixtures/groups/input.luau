@@ -2,10 +2,14 @@ local RUN_SERVICE = game:GetService("RunService")
 
 
 local PLAYERS = game:GetService("Players")
-local signal = require("@pkg/signal")
-type Signal = signal.Signal
+const alpha = require("@one/alpha")
+const beta = require("@one/beta")
+const gamma = require("@two/gamma")
+type Gamma = gamma.Gamma
 type Small = string
-local MAX_COUNT = 4
+const MAX_COUNT = 4
+const Widget = {}
+Widget.__index = Widget
 local function first()
 end
 local function second()
