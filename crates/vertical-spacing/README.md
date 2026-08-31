@@ -1,29 +1,22 @@
-# vertical-spacing-worm
+# vertical-spacing
 
-A native larvae formatter for plain Luau. It runs larvae's standard formatter with the project's resolved `[fmt]` settings, then enforces the deterministic parts of the vertical-spacing preferences.
+A larvae worm that applies consistent blank-line spacing to Luau.
 
-It enforces:
+## Spacing
 
-- contiguous engine service bindings;
-- contiguous requires from the same import alias, with one blank line between aliases;
-- one blank line between services, requires, reimported types, local types, exported types, constants, class declarations, functions, and the module return;
-- contiguous adjacent simple local aliases and contiguous adjacent exported aliases;
-- one blank line around multiline value and type declarations;
-- contiguous declarations and indexed assignments to the declared value;
-- one blank line between top-level functions;
-- one blank line after a guard whose branches terminate with `return`, `break`, `continue`, or `error(...)`;
-- one blank line before a noninitial `return` in any block;
-- at most one blank line through larvae's standard formatter.
+The formatter keeps related declarations together and inserts one blank line:
 
-It does not reorder statements or guess whether arbitrary assignments are related. A boundary containing a comment is left unchanged so formatting cannot silently change which statement owns the comment.
+- between services, require aliases, type groups, constants, classes, functions, and the module return;
+- around multiline declarations;
+- around `if`, `for`, `while`, `repeat`, and `do` blocks;
+- around function and class declarations;
+- before a noninitial `return`.
 
-## Use
+Declarations remain adjacent to indexed assignments that populate them. Consecutive blank lines are collapsed.
 
-Install the worm from a GitHub release of the workspace:
+## Install
 
 ```text
-larvae worm add owner/worms@0.1.0 --name vertical-spacing
+larvae worm add 0hirume/worms@0.2.1 --name vertical-spacing
 larvae worm install
 ```
-
-`larvae fmt` then routes `.luau` and `.lua` files through the worm.
