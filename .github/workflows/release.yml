@@ -1,0 +1,92 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+concurrency:
+  group: release
+
+permissions: {}
+
+jobs:
+  create:
+    name: create GitHub release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: create release
+        env:
+          GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        shell: bash
+        run: >-
+          gh release create "$RELEASE_TAG"
+          --verify-tag
+          --generate-notes
+          --title "$RELEASE_TAG"
+
+  upload:
+    name: upload ${{ matrix.worm.name }} for ${{ matrix.platform.target }}
+    needs: create
+    strategy:
+      fail-fast: false
+      matrix:
+        worm:
+          - name: vertical-spacing
+            package: vertical-spacing-worm
+            binary: vertical-spacing-worm
+            manifest: crates/vertical-spacing/worm.toml
+        platform:
+          - runner: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            system: linux
+            architecture: x86_64
+          - runner: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+            system: linux
+            architecture: aarch64
+          - runner: macos-latest
+            target: x86_64-apple-darwin
+            system: macos
+            architecture: x86_64
+          - runner: macos-latest
+            target: aarch64-apple-darwin
+            system: macos
+            architecture: aarch64
+          - runner: windows-latest
+            target: x86_64-pc-windows-msvc
+            system: windows
+            architecture: x86_64
+    runs-on: ${{ matrix.platform.runner }}
+    timeout-minutes: 90
+    permissions:
+      contents: write
+    steps:
+      - name: check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: set up tools
+        uses: jdx/mise-action@7e36c90d9ab29c415a2384db3006f3ec8a8cc654 # v4.2.4
+        with:
+          version: 2026.8.10
+          cache: false
+
+      - name: build, package, and upload worm
+        uses: taiki-e/upload-rust-binary-action@f0d45ae91ee7b8ee928de7a9d04d893a08bcbec6 # v1.30.2
+        with:
+          bin: ${{ matrix.worm.binary }}
+          package: ${{ matrix.worm.package }}
+          target: ${{ matrix.platform.target }}
+          archive: ${{ matrix.worm.binary }}-${{ matrix.platform.architecture }}-${{ matrix.platform.system }}
+          include: ${{ matrix.worm.manifest }}
+          zip: all
+          tar: none
+          locked: true
+          all-features: true
