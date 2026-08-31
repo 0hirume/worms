@@ -7,7 +7,7 @@ A larvae worm that applies consistent blank-line spacing to Luau.
 The formatter keeps related declarations together and inserts one blank line:
 
 - between services, require aliases, type groups, constants, classes, functions, and the module return;
-- around multiline declarations;
+- around expanded calls, tables, and types;
 - around `if`, `for`, `while`, `repeat`, and `do` blocks;
 - around function and class declarations;
 - before a noninitial `return`.
