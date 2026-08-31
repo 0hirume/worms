@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 
 use larvae::fmt::FmtConfig;
+use larvae::fmt::config::RequireGrouping;
 use vertical_spacing_worm::format_luau;
 
 fn check_fixture(name: &str, fmt: &FmtConfig) {
@@ -23,7 +24,11 @@ fn check_fixture(name: &str, fmt: &FmtConfig) {
 
 #[test]
 fn top_level_groups() {
-    check_fixture("groups", &FmtConfig::default());
+    let mut fmt = FmtConfig::default();
+    fmt.sort_requires.enabled = true;
+    fmt.sort_requires.grouping = RequireGrouping::ByKind;
+
+    check_fixture("groups", &fmt);
 }
 
 #[test]

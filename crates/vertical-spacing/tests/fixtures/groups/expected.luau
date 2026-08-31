@@ -1,10 +1,10 @@
 local RUN_SERVICE = game:GetService("RunService")
 local PLAYERS = game:GetService("Players")
 
-const alpha = require("@one/alpha")
-const beta = require("@one/beta")
+const alpha = require("@zeta/alpha")
+const beta = require("@zeta/beta")
 
-const gamma = require("@two/gamma")
+const gamma = require("@alpha/gamma")
 
 type Gamma = gamma.Gamma
 
