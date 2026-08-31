@@ -5,10 +5,11 @@ A native larvae formatter for plain Luau. It runs larvae's standard formatter wi
 It enforces:
 
 - contiguous engine service bindings;
-- contiguous requires;
-- one blank line between services, requires, reimported types, local types, constants, functions, and the module return;
+- contiguous requires from the same import alias, with one blank line between aliases;
+- one blank line between services, requires, reimported types, local types, constants, class declarations, functions, and the module return;
 - contiguous adjacent simple type aliases;
-- one blank line between multiline record or union aliases;
+- one blank line around multiline value and type declarations;
+- contiguous declarations and indexed assignments to the declared value;
 - one blank line between top-level functions;
 - one blank line after a guard whose branches terminate with `return`, `break`, `continue`, or `error(...)`;
 - one blank line before a noninitial `return` in any block;
