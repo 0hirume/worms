@@ -15,6 +15,7 @@ enum TopGroup {
     Require,
     ReimportedType,
     LocalType,
+    ExportedType,
     Constant,
     Class,
     Function,
@@ -105,6 +106,7 @@ fn top_group(statement: &Stmt, source: &str, tokens: &[Tok]) -> Option<TopGroup>
         Stmt::Local(_) if require_alias(statement, source, tokens).is_some() => {
             Some(TopGroup::Require)
         }
+        Stmt::TypeAlias(alias) if alias.exported => Some(TopGroup::ExportedType),
         Stmt::TypeAlias(alias) if is_reimported_type(alias.span, source, tokens) => {
             Some(TopGroup::ReimportedType)
         }
