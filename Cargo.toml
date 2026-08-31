@@ -7,6 +7,7 @@ edition = "2024"
 version = "0.1.1"
 
 [workspace.metadata.release]
+pre-release-commit-message = "chore(release): release v{{version}}"
 publish = false
 shared-version = true
 tag-name = "v{{version}}"
