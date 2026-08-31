@@ -55,6 +55,14 @@ fn statement_blocks() {
 }
 
 #[test]
+fn expanded_calls_tables_and_types() {
+    let mut fmt = FmtConfig::default();
+    fmt.table_types.width = 20;
+
+    check_fixture("expanded", &fmt);
+}
+
+#[test]
 fn initial_returns() {
     check_fixture("first-return", &FmtConfig::default());
 }
