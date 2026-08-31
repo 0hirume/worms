@@ -1,0 +1,33 @@
+[tasks.build]
+description = "Build every native worm"
+run = "cargo build --workspace --release --locked"
+
+[tasks.format]
+description = "Format the workspace"
+run = "cargo fmt --all"
+
+[tasks.lint]
+description = "Run strict static checks"
+run = [
+  "cargo fmt --all -- --check",
+  "cargo clippy --workspace --all-targets --all-features --locked",
+  "tombi lint",
+  "actionlint .github/workflows/ci.yml .github/workflows/release.yml",
+  "zizmor .github/workflows/ci.yml .github/workflows/release.yml",
+]
+
+[tasks.test]
+description = "Run the test suite"
+run = "cargo test --workspace --all-features --locked"
+
+[tasks.check]
+description = "Run every project check"
+depends = ["lint", "test"]
+
+[tools]
+"aqua:rhysd/actionlint" = "latest"
+"aqua:tombi-toml/tombi" = "latest"
+"github:zizmorcore/zizmor" = "latest"
+"npm:@actions/languageserver" = "latest"
+"npm:oxfmt" = "latest"
+rust = { version = "nightly", profile = "minimal", components = ["rust-analyzer", "rustfmt", "clippy"] }
