@@ -1,4 +1,4 @@
-use larvae::syntax::ast::{Block, CallArgs, Expr, Stmt};
+use larvae::syntax::ast::{CallArgs, Expr, Stmt};
 use larvae::syntax::lexer::Tok;
 
 use crate::syntax::span_text;
@@ -18,7 +18,6 @@ enum TopGroup {
     ExportedType,
     Constant,
     Class,
-    Function,
     ModuleReturn,
 }
 
@@ -29,7 +28,7 @@ pub fn gap_between(
     tokens: &[Tok],
     is_top: bool,
 ) -> Option<Gap> {
-    if matches!(next, Stmt::Return(_)) || is_guard(previous, source, tokens) {
+    if matches!(next, Stmt::Return(_)) || is_block_statement(previous) || is_block_statement(next) {
         return Some(Gap::Blank);
     }
 
@@ -84,7 +83,6 @@ pub fn gap_between(
                 _ => None,
             }
         }
-        (Some(TopGroup::Function), Some(TopGroup::Function)) => Some(Gap::Blank),
         (Some(TopGroup::LocalType), Some(TopGroup::LocalType)) => Some(Gap::Tight),
         (Some(left), Some(right)) if left == right => Some(Gap::Tight),
         (Some(_), Some(_)) => Some(Gap::Blank),
@@ -126,7 +124,6 @@ fn top_group(statement: &Stmt, source: &str, tokens: &[Tok]) -> Option<TopGroup>
         {
             Some(TopGroup::Constant)
         }
-        Stmt::Function(_) | Stmt::LocalFunction(_) => Some(TopGroup::Function),
         Stmt::Return(_) => Some(TopGroup::ModuleReturn),
         _ => None,
     }
@@ -289,43 +286,17 @@ fn is_screaming_snake(name: &str) -> bool {
     has_letter
 }
 
-fn is_guard(statement: &Stmt, source: &str, tokens: &[Tok]) -> bool {
-    let Stmt::If(statement) = statement else {
-        return false;
-    };
-
-    statement.else_block.is_none()
-        && !statement.branches.is_empty()
-        && statement
-            .branches
-            .iter()
-            .all(|(_, block)| block_terminates(block, source, tokens))
-}
-
-fn block_terminates(block: &Block, source: &str, tokens: &[Tok]) -> bool {
-    let Some(statement) = block
-        .stmts
-        .iter()
-        .rev()
-        .find(|statement| !matches!(statement, Stmt::Empty(_)))
-    else {
-        return false;
-    };
-
-    match statement {
-        Stmt::Return(_) | Stmt::Break(_) | Stmt::Continue(_) => true,
-        Stmt::Call(expression, _) => is_error_call(expression, source, tokens),
-        _ => false,
-    }
-}
-
-fn is_error_call(expression: &Expr, source: &str, tokens: &[Tok]) -> bool {
-    let Expr::Call { func, .. } = expression else {
-        return false;
-    };
-    let Expr::Name(name) = func.as_ref() else {
-        return false;
-    };
-
-    span_text(*name, source, tokens) == "error"
+const fn is_block_statement(statement: &Stmt) -> bool {
+    matches!(
+        statement,
+        Stmt::Do(_)
+            | Stmt::While(_)
+            | Stmt::Repeat(_)
+            | Stmt::If(_)
+            | Stmt::NumericFor(_)
+            | Stmt::GenericFor(_)
+            | Stmt::Function(_)
+            | Stmt::LocalFunction(_)
+            | Stmt::Class(_)
+    )
 }
