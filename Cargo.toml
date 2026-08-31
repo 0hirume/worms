@@ -4,7 +4,7 @@ resolver = "3"
 
 [workspace.package]
 edition = "2024"
-version = "0.2.2"
+version = "0.2.3"
 
 [workspace.metadata.release]
 pre-release-commit-message = "chore(release): release v{{version}}"
