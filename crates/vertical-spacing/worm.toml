@@ -1,0 +1,8 @@
+name = "vertical-spacing"
+api = 1
+form = "native"
+entry = "vertical-spacing-worm"
+
+[frontend]
+claims = [".luau", ".lua"]
+fmt = true

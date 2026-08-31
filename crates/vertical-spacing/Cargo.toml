@@ -1,0 +1,12 @@
+[package]
+name = "vertical-spacing-worm"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+larvae.workspace = true
+larvae-worm.workspace = true
+serde_json.workspace = true
+
+[lints]
+workspace = true
