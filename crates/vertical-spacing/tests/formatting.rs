@@ -50,6 +50,11 @@ fn guards_and_noninitial_returns() {
 }
 
 #[test]
+fn statement_blocks() {
+    check_fixture("blocks", &FmtConfig::default());
+}
+
+#[test]
 fn initial_returns() {
     check_fixture("first-return", &FmtConfig::default());
 }
