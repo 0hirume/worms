@@ -6,8 +6,8 @@ It enforces:
 
 - contiguous engine service bindings;
 - contiguous requires from the same import alias, with one blank line between aliases;
-- one blank line between services, requires, reimported types, local types, constants, class declarations, functions, and the module return;
-- contiguous adjacent simple type aliases;
+- one blank line between services, requires, reimported types, local types, exported types, constants, class declarations, functions, and the module return;
+- contiguous adjacent simple local aliases and contiguous adjacent exported aliases;
 - one blank line around multiline value and type declarations;
 - contiguous declarations and indexed assignments to the declared value;
 - one blank line between top-level functions;
