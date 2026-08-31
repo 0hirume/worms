@@ -17,6 +17,6 @@ Declarations remain adjacent to indexed assignments that populate them. Consecut
 ## Install
 
 ```text
-larvae worm add 0hirume/worms@0.2.1 --name vertical-spacing
+larvae worm add 0hirume/worms --name vertical-spacing
 larvae worm install
 ```
