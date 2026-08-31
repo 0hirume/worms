@@ -6,6 +6,11 @@ resolver = "3"
 edition = "2024"
 version = "0.1.0"
 
+[workspace.metadata.release]
+publish = false
+shared-version = true
+tag-name = "v{{version}}"
+
 [workspace.dependencies]
 larvae = "0.7"
 larvae-worm = { version = "0.7", features = ["native"] }
