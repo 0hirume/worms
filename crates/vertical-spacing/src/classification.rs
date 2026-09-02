@@ -16,7 +16,6 @@ enum TopGroup {
     ReimportedType,
     LocalType,
     ExportedType,
-    Constant,
     Class,
     ModuleReturn,
 }
@@ -120,15 +119,6 @@ fn top_group(statement: &Stmt, source: &str, tokens: &[Tok]) -> Option<TopGroup>
             if indexed_assignment_root(statement, source, tokens).is_some_and(is_pascal_case) =>
         {
             Some(TopGroup::Class)
-        }
-        Stmt::Local(local)
-            if local.is_const
-                || (!local.names.is_empty()
-                    && local.names.iter().all(|binding| {
-                        is_screaming_snake(span_text(binding.name, source, tokens))
-                    })) =>
-        {
-            Some(TopGroup::Constant)
         }
         Stmt::Return(_) => Some(TopGroup::ModuleReturn),
         _ => None,
@@ -352,20 +342,6 @@ fn is_pascal_case(name: &str) -> bool {
         .is_some_and(|byte| byte.is_ascii_uppercase())
         && name.bytes().any(|byte| byte.is_ascii_lowercase())
         && name.bytes().all(|byte| byte.is_ascii_alphanumeric())
-}
-
-fn is_screaming_snake(name: &str) -> bool {
-    let mut has_letter = false;
-
-    for byte in name.bytes() {
-        if byte.is_ascii_lowercase() || !(byte.is_ascii_alphanumeric() || byte == b'_') {
-            return false;
-        }
-
-        has_letter |= byte.is_ascii_uppercase();
-    }
-
-    has_letter
 }
 
 const fn is_block_statement(statement: &Stmt) -> bool {
