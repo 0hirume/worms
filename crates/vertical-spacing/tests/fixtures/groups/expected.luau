@@ -10,6 +10,8 @@ type Gamma = gamma.Gamma
 
 type Small = string
 
+const client = create_client()
+
 const MAX_COUNT = 4
 
 const Widget = {}
