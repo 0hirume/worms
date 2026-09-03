@@ -12,7 +12,7 @@ The formatter keeps related declarations together and inserts one blank line:
 - around function and class declarations;
 - before a noninitial `return`.
 
-Declarations remain adjacent to indexed assignments that populate them. Consecutive blank lines are collapsed.
+A declaration and the indexed assignments that populate it form one block. Consecutive blank lines are collapsed.
 
 ## Install
 
