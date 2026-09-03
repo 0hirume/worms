@@ -23,10 +23,11 @@ pub fn collect_boundaries(
         .filter(|statement| !matches!(statement, Stmt::Empty(_)))
         .collect();
 
-    for pair in statements.windows(2) {
+    for (index, pair) in statements.windows(2).enumerate() {
         let previous = pair[0];
         let next = pair[1];
-        let gap = gap_between(previous, next, source, &lexed.toks, is_top);
+        let following = statements.get(index + 2).copied();
+        let gap = gap_between(previous, next, following, source, &lexed.toks, is_top);
 
         if let Some(gap) = gap
             && let (Some((_, start)), Some((end, _))) = (

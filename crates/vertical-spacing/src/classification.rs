@@ -23,6 +23,7 @@ enum TopGroup {
 pub fn gap_between(
     previous: &Stmt,
     next: &Stmt,
+    following: Option<&Stmt>,
     source: &str,
     tokens: &[Tok],
     is_top: bool,
@@ -34,6 +35,14 @@ pub fn gap_between(
     if has_expanded_expression(previous, source, tokens)
         || has_expanded_expression(next, source, tokens)
     {
+        return Some(Gap::Blank);
+    }
+
+    if following.is_some_and(|following| {
+        declaration_name(next, source, tokens).is_some_and(|declaration| {
+            indexed_assignment_root(following, source, tokens) == Some(declaration)
+        })
+    }) {
         return Some(Gap::Blank);
     }
 
@@ -51,12 +60,9 @@ pub fn gap_between(
     if let (Some(previous_root), Some(next_root)) = (
         indexed_assignment_root(previous, source, tokens),
         indexed_assignment_root(next, source, tokens),
-    ) {
-        return Some(if previous_root == next_root {
-            Gap::Tight
-        } else {
-            Gap::Blank
-        });
+    ) && previous_root == next_root
+    {
+        return Some(Gap::Tight);
     }
 
     if indexed_assignment_root(previous, source, tokens).is_some() && matches!(next, Stmt::Local(_))
